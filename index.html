@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Horas Extras</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #F5F5F5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: #0C2139;
+            color: #FFFFFF;
+            padding: 20px 16px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .section {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-box {
+            background-color: #0C3260;
+            color: #FFFFFF;
+            padding: 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .info-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            color: #0C2139;
+        }
+
+        .tooltip-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background-color: #00DEFF;
+            color: #0C2139;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tooltip-text {
+            display: none;
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #00DEFF;
+            color: #0C2139;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            width: 250px;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            font-weight: normal;
+        }
+
+        .tooltip-icon:hover .tooltip-text,
+        .tooltip-icon:active .tooltip-text {
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #DDD;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #00DEFF;
+        }
+
+        .form-input.error {
+            border-color: #FF4444;
+        }
+
+        .error-message {
+            color: #FF4444;
+            font-size: 13px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .choice-container {
+            margin-top: 12px;
+        }
+
+        .choice-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .choice-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .choice-button {
+            padding: 16px;
+            border: 2px solid #0C3260;
+            background-color: #0C3260;
+            color: #FFFFFF;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 15px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .choice-button.active {
+            background-color: #00DEFF;
+            border-color: #00DEFF;
+            color: #0C2139;
+            font-weight: 600;
+        }
+
+        .choice-button:hover {
+            opacity: 0.9;
+        }
+
+        .dynamic-fields {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .dynamic-fields.show {
+            display: block;
+        }
+
+        .time-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%230C2139' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 40px;
+        }
+
+        .results-section {
+            background: linear-gradient(135deg, #0C2139 0%, #0C3260 100%);
+            color: #FFFFFF;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .results-section h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #00DEFF;
+        }
+
+        .result-item {
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .result-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+
+        .result-value {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .result-formula {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .result-total {
+            background-color: rgba(0, 222, 255, 0.2);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .result-total .result-value {
+            font-size: 28px;
+            color: #00DEFF;
+            font-weight: bold;
+        }
+
+        .whatsapp-button {
+            width: 100%;
+            padding: 18px;
+            background-color: #00DEFF;
+            color: #0C2139;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .whatsapp-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 222, 255, 0.4);
+        }
+
+        .whatsapp-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #0C3260;
+            font-size: 13px;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                padding: 24px;
+            }
+
+            .section {
+                padding: 28px;
+            }
+
+            .choice-buttons {
+                flex-direction: row;
+            }
+
+            .time-inputs {
+                flex-direction: row;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Calculadora de Horas Extras</h1>
+    </div>
+
+    <div class="container">
+        <!-- Informação sobre carga horária -->
+        <div class="section">
+            <div class="info-box">
+                <span class="info-icon">ℹ️</span>
+                <div>A carga horária semanal é de 44 horas (8:48 por dia), e para fins de cálculos considera-se 5 semanas, logo 44×5 = 220 horas mensais.</div>
+            </div>
+        </div>
+
+        <!-- Salário Bruto -->
+        <div class="section">
+            <div class="form-group">
+                <label class="form-label">
+                    Salário Bruto Mensal
+                    <span class="tooltip-icon">
+                        ?
+                        <span class="tooltip-text">Informe seu salário bruto mensal (total antes de descontos). Será usado como base para o cálculo.</span>
+                    </span>
+                </label>
+                <input 
+                    type="text" 
+                    id="salarioBruto" 
+                    class="form-input" 
+                    placeholder="R$ 0,00"
+                    maxlength="15"
+                >
+                <div class="error-message" id="salarioError"></div>
+            </div>
+        </div>
+
+        <!-- Escolha do tipo de entrada de horas -->
+        <div class="section">
+            <div class="form-group">
+                <label class="form-label">Como você quer informar suas horas extras?</label>
+                <div class="choice-description">Escolha como você prefere informar suas horas extras</div>
+                <div class="choice-container">
+                    <div class="choice-buttons">
+                        <div class="choice-button" id="btnQuantidade" onclick="selectHorasOption('quantidade')">
+                            Tenho a quantidade de horas
+                        </div>
+                        <div class="choice-button" id="btnEntradaSaida" onclick="selectHorasOption('entrada_saida')">
+                            Tenho apenas o horário de entrada e saída
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Campo quantidade de horas -->
+                <div class="dynamic-fields" id="quantidadeField">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Quantidade de Horas Extras
+                            <span class="tooltip-icon">
+                                ?
+                                <span class="tooltip-text">Informe a quantidade total de horas extras trabalhadas no formato HH:MM (ex: 02:30 para 2 horas e 30 minutos)</span>
+                            </span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="qtdHorasField" 
+                            class="form-input" 
+                            placeholder="00:00"
+                            maxlength="5"
+                        >
+                        <div class="error-message" id="qtdHorasError"></div>
+                    </div>
+                </div>
+
+                <!-- Campos entrada e saída -->
+                <div class="dynamic-fields" id="entradaSaidaFields">
+                    <div class="time-inputs">
+                        <div class="form-group" style="flex: 1;">
+                            <label class="form-label">
+                                Que horas você chegou?
+                                <span class="tooltip-icon">
+                                    ?
+                                    <span class="tooltip-text">Informe o horário que você começou o trabalho extra no formato HH:MM (ex: 18:00)</span>
+                                </span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="horaEntradaField" 
+                                class="form-input" 
+                                placeholder="00:00"
+                                maxlength="5"
+                            >
+                            <div class="error-message" id="horaEntradaError"></div>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label class="form-label">
+                                Que horas você saiu?
+                                <span class="tooltip-icon">
+                                    ?
+                                    <span class="tooltip-text">Informe o horário que você saiu no formato HH:MM (ex: 20:30)</span>
+                                </span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="horaSaidaField" 
+                                class="form-input" 
+                                placeholder="00:00"
+                                maxlength="5"
+                            >
+                            <div class="error-message" id="horaSaidaError"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Percentual do adicional -->
+        <div class="section">
+            <div class="form-group">
+                <label class="form-label">
+                    Percentual do Adicional
+                    <span class="tooltip-icon">
+                        ?
+                        <span class="tooltip-text">Selecione o tipo de hora extra. Use 60% para dias úteis e 100% para domingos e feriados</span>
+                    </span>
+                </label>
+                <select id="percentualAdicional" class="form-input">
+                    <option value="60">60% - Hora Extra Normal</option>
+                    <option value="100">100% - Hora Extra Domingo/Feriado</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Resultados -->
+        <div class="results-section" id="resultsSection">
+            <h2>Resultado do Cálculo</h2>
+            
+            <div class="result-item">
+                <div class="result-label">Valor da hora normal</div>
+                <div class="result-value" id="valorHoraNormal">R$ 0,00</div>
+                <div class="result-formula" id="formulaHoraNormal"></div>
+            </div>
+
+            <div class="result-item">
+                <div class="result-label">Valor da hora extra</div>
+                <div class="result-value" id="valorHoraExtra">R$ 0,00</div>
+                <div class="result-formula" id="formulaHoraExtra"></div>
+            </div>
+
+            <div class="result-item">
+                <div class="result-label">Quantidade de horas extras</div>
+                <div class="result-value" id="qtdHorasDisplay">0h</div>
+            </div>
+
+            <div class="result-total">
+                <div class="result-label">Total a receber</div>
+                <div class="result-value" id="totalReceber">R$ 0,00</div>
+                <div class="result-formula" id="formulaTotal"></div>
+            </div>
+        </div>
+
+        <!-- Botão WhatsApp -->
+        <button class="whatsapp-button" id="whatsappBtn" onclick="shareWhatsApp()">
+            <span style="font-size: 24px;">📱</span>
+            Compartilhar no WhatsApp
+        </button>
+    </div>
+
+    <div class="footer">
+        © 2025 Rafael Ferreira da Silva (@rfdas)
+    </div>
+
+    <script>
+        let selectedOption = null;
+        let calculationData = {
+            salario: 0,
+            horasExtras: 0,
+            percentual: 60,
+            valorHoraNormal: 0,
+            valorHoraExtra: 0,
+            totalReceber: 0
+        };
+
+        // Formatação de moeda brasileira
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(value);
+        }
+
+        // Formatação de input de moeda
+        function formatCurrencyInput(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value === '') {
+                input.value = '';
+                return 0;
+            }
+            let numValue = parseFloat(value) / 100;
+            input.value = formatCurrency(numValue).replace('R$', '').trim();
+            return numValue;
+        }
+
+        // Formatação de horário HH:MM
+        function formatTimeInput(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + ':' + value.substring(2, 4);
+            }
+            input.value = value;
+        }
+
+        // Validação de horário HH:MM
+        function validateTime(time) {
+            const regex = /^([0-9]{1,2}):([0-9]{2})$/;
+            const match = time.match(regex);
+            if (!match) return false;
+            const hours = parseInt(match[1]);
+            const minutes = parseInt(match[2]);
+            return hours >= 0 && hours <= 99 && minutes >= 0 && minutes <= 59;
+        }
+
+        // Converter HH:MM para decimal
+        function timeToDecimal(time) {
+            const [hours, minutes] = time.split(':').map(Number);
+            return hours + (minutes / 60);
+        }
+
+        // Converter decimal para HH:MM para exibição
+        function decimalToTimeDisplay(decimal) {
+            const hours = Math.floor(decimal);
+            const minutes = Math.round((decimal - hours) * 60);
+            return `${hours}h${minutes > 0 ? minutes.toString().padStart(2, '0') + 'min' : ''}`;
+        }
+
+        // Selecionar opção de entrada de horas
+        function selectHorasOption(option) {
+            selectedOption = option;
+            
+            // Atualizar botões
+            document.getElementById('btnQuantidade').classList.remove('active');
+            document.getElementById('btnEntradaSaida').classList.remove('active');
+            
+            if (option === 'quantidade') {
+                document.getElementById('btnQuantidade').classList.add('active');
+                document.getElementById('quantidadeField').classList.add('show');
+                document.getElementById('entradaSaidaFields').classList.remove('show');
+            } else {
+                document.getElementById('btnEntradaSaida').classList.add('active');
+                document.getElementById('entradaSaidaFields').classList.add('show');
+                document.getElementById('quantidadeField').classList.remove('show');
+            }
+            
+            calculateResults();
+        }
+
+        // Mostrar erro
+        function showError(fieldId, message) {
+            const errorElement = document.getElementById(fieldId + 'Error');
+            const inputElement = document.getElementById(fieldId);
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.classList.add('show');
+            }
+            if (inputElement) {
+                inputElement.classList.add('error');
+            }
+        }
+
+        // Limpar erro
+        function clearError(fieldId) {
+            const errorElement = document.getElementById(fieldId + 'Error');
+            const inputElement = document.getElementById(fieldId);
+            if (errorElement) {
+                errorElement.classList.remove('show');
+            }
+            if (inputElement) {
+                inputElement.classList.remove('error');
+            }
+        }
+
+        // Calcular resultados
+        function calculateResults() {
+            clearError('salarioBruto');
+            clearError('qtdHorasField');
+            clearError('horaEntradaField');
+            clearError('horaSaidaField');
+
+            // Validar salário
+            const salarioInput = document.getElementById('salarioBruto');
+            const salarioValue = salarioInput.value.replace(/\./g, '').replace(',', '.');
+            const salario = parseFloat(salarioValue);
+
+            if (!salario || salario <= 0 || salario > 999999.99) {
+                calculationData.salario = 0;
+                updateDisplay();
+                return;
+            }
+
+            calculationData.salario = salario;
+
+            // Obter horas extras
+            let horasExtras = 0;
+            if (selectedOption === 'quantidade') {
+                const qtdHoras = document.getElementById('qtdHorasField').value;
+                if (qtdHoras && validateTime(qtdHoras)) {
+                    horasExtras = timeToDecimal(qtdHoras);
+                } else {
+                    calculationData.horasExtras = 0;
+                    updateDisplay();
+                    return;
+                }
+            } else if (selectedOption === 'entrada_saida') {
+                const entrada = document.getElementById('horaEntradaField').value;
+                const saida = document.getElementById('horaSaidaField').value;
+                
+                if (entrada && saida && validateTime(entrada) && validateTime(saida)) {
+                    const entradaDecimal = timeToDecimal(entrada);
+                    const saidaDecimal = timeToDecimal(saida);
+                    
+                    if (saidaDecimal <= entradaDecimal) {
+                        showError('horaSaidaField', 'Horário de saída deve ser maior que entrada');
+                        calculationData.horasExtras = 0;
+                        updateDisplay();
+                        return;
+                    }
+                    
+                    horasExtras = saidaDecimal - entradaDecimal;
+                } else {
+                    calculationData.horasExtras = 0;
+                    updateDisplay();
+                    return;
+                }
+            } else {
+                calculationData.horasExtras = 0;
+                updateDisplay();
+                return;
+            }
+
+            calculationData.horasExtras = horasExtras;
+
+            // Obter percentual
+            const percentual = parseInt(document.getElementById('percentualAdicional').value);
+            calculationData.percentual = percentual;
+
+            // Calcular valores
+            calculationData.valorHoraNormal = salario / 220;
+            calculationData.valorHoraExtra = calculationData.valorHoraNormal * (1 + percentual / 100);
+            calculationData.totalReceber = calculationData.valorHoraExtra * horasExtras;
+
+            updateDisplay();
+        }
+
+        // Atualizar display dos resultados
+        function updateDisplay() {
+            document.getElementById('valorHoraNormal').textContent = formatCurrency(calculationData.valorHoraNormal);
+            document.getElementById('formulaHoraNormal').textContent = 
+                calculationData.salario > 0 ? `${formatCurrency(calculationData.salario)} ÷ 220h` : '';
+
+            document.getElementById('valorHoraExtra').textContent = formatCurrency(calculationData.valorHoraExtra);
+            document.getElementById('formulaHoraExtra').textContent = 
+                calculationData.valorHoraNormal > 0 ? 
+                `${formatCurrency(calculationData.valorHoraNormal)} × ${(1 + calculationData.percentual / 100).toFixed(2)}` : '';
+
+            document.getElementById('qtdHorasDisplay').textContent = 
+                calculationData.horasExtras > 0 ? decimalToTimeDisplay(calculationData.horasExtras) : '0h';
+
+            document.getElementById('totalReceber').textContent = formatCurrency(calculationData.totalReceber);
+            document.getElementById('formulaTotal').textContent = 
+                calculationData.horasExtras > 0 ? 
+                `${formatCurrency(calculationData.valorHoraExtra)} × ${calculationData.horasExtras.toFixed(2)}h` : '';
+
+            // Habilitar/desabilitar botão WhatsApp
+            const btn = document.getElementById('whatsappBtn');
+            btn.disabled = calculationData.totalReceber <= 0;
+        }
+
+        // Compartilhar no WhatsApp
+        function shareWhatsApp() {
+            if (calculationData.totalReceber <= 0) {
+                alert('Por favor, preencha todos os campos corretamente antes de compartilhar.');
+                return;
+            }
+
+            const horasDisplay = decimalToTimeDisplay(calculationData.horasExtras).replace('min', '');
+            
+            const message = `Cálculo de Horas Extras\n` +
+                `Salário base: ${formatCurrency(calculationData.salario)}\n` +
+                `Quantidade de horas extras (${calculationData.percentual}%): ${horasDisplay}\n` +
+                `Valor de 1 HE (${calculationData.percentual}%): ${formatCurrency(calculationData.valorHoraExtra)}\n` +
+                `Total a receber: *${formatCurrency(calculationData.totalReceber)}*`;
+
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Event listeners
+        document.getElementById('salarioBruto').addEventListener('input', function(e) {
+            formatCurrencyInput(e.target);
+            calculateResults();
+        });
+
+        document.getElementById('salarioBruto').addEventListener('blur', function(e) {
+            formatCurrencyInput(e.target);
+            calculateResults();
+        });
+
+        document.getElementById('qtdHorasField').addEventListener('input', function(e) {
+            formatTimeInput(e.target);
+            calculateResults();
+        });
+
+        document.getElementById('horaEntradaField').addEventListener('input', function(e) {
+            formatTimeInput(e.target);
+            calculateResults();
+        });
+
+        document.getElementById('horaSaidaField').addEventListener('input', function(e) {
+            formatTimeInput(e.target);
+            calculateResults();
+        });
+
+        document.getElementById('percentualAdicional').addEventListener('change', calculateResults);
+
+        // Inicializar
+        updateDisplay();
+    </script>
+</body>
+</html>
